@@ -1,0 +1,52 @@
+# ─────────────────────────────────────────────────────────────
+# GitHub runs this every ~5 minutes for free (public repo).
+# Note: GitHub sometimes runs scheduled jobs a few minutes late
+# when it's busy — normal, nothing to fix.
+# ─────────────────────────────────────────────────────────────
+name: Restock Watch
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:        # adds a "Run workflow" button for a manual check
+
+# Least privilege: the job can only update this repo's files.
+permissions:
+  contents: write
+
+# Never let two runs overlap (they'd both edit state.json).
+concurrency:
+  group: restock-watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check stock & answer Telegram
+        run: node bot/watch.mjs
+        env:
+          # Stored encrypted in Settings → Secrets; GitHub hides them in logs.
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          ALLOWED_HOSTS: ${{ vars.ALLOWED_HOSTS }}
+
+      - name: Save state if anything changed
+        run: |
+          if git diff --quiet -- bot/state.json; then
+            echo "Nothing to save."
+            exit 0
+          fi
+          git config user.name  "restock-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add bot/state.json
+          git commit -m "bot: update watchlist state [skip ci]"
+          git pull --rebase --quiet
+          git push --quiet

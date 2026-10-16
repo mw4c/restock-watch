@@ -23,7 +23,44 @@ Shops like Dyson put bot detection and CAPTCHAs on checkout. Auto-buying would m
 | `src/server.js` | Dashboard login + API, security headers, rate limits |
 | `public/` | The dashboard (HTML/CSS/JS) |
 
-## Deploy from your phone or iPad (~15 minutes, no laptop)
+## Free setup from your phone (no card, no server) ⭐
+
+Runs on **GitHub Actions** — free for public repos. It checks every ~5 minutes, and you control it by chatting with your Telegram bot.
+
+**1. Telegram bot** — in Telegram, @BotFather → `/newbot` → copy the token.
+
+**2. Add the token to GitHub** (github.com in Safari → this repo)
+*Settings → Secrets and variables → Actions → New repository secret*
+- Name: `TELEGRAM_BOT_TOKEN` · Secret: your token → *Add secret*
+
+**3. Turn it on & get your chat ID**
+1. Repo → **Actions** tab → if asked, tap *I understand… enable workflows*.
+2. In Telegram, send `/start` to your bot.
+3. Within ~5 min the bot replies with **your chat ID** (or tap *Restock Watch → Run workflow* in the Actions tab to make it reply now).
+4. Add a second secret: Name `TELEGRAM_CHAT_ID` · Secret: that number.
+
+**4. Use it** — just send the bot a product link:
+```
+https://www.dyson.com.sg/hushjet-purifier-compact-black-teal HushJet Teal
+```
+| Message | What it does |
+|---|---|
+| *a product link* (+ optional nickname) | Start watching |
+| `/list` | Show what's watched + status |
+| `/remove 2` | Stop watching item 2 |
+| `/phrase 2 Notify me` | Tell it the sold-out wording for item 2 |
+
+Replies take up to ~5 minutes because the bot wakes up on a schedule.
+
+**Good to know**
+- The repo is public, so `bot/state.json` (your watched links and their status) is visible to anyone. Your token and chat ID are encrypted GitHub secrets and are never shown.
+- Only messages from your chat ID are obeyed; anyone else just gets told their own ID.
+- To allow more shops: *Settings → Secrets and variables → Actions → Variables* → add `ALLOWED_HOSTS` (comma-separated hostnames, include the defaults you still want).
+- GitHub sometimes runs scheduled jobs a few minutes late. The bot makes a small weekly commit so GitHub doesn't pause it for inactivity.
+
+---
+
+## Paid alternative: always-on dashboard on Render
 
 **1. Make your Telegram bot** (Telegram app)
 1. Search **@BotFather** → send `/newbot` → pick a name.
