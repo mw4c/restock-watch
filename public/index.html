@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Restock Watch</title>
+  <!-- "Add to Home Screen" on iPhone/iPad makes this feel like an app -->
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Restock">
+  <meta name="theme-color" content="#e8622c">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=JetBrains+Mono:wght@500&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <!-- All JS lives in app.js; the CSP forbids inline scripts. -->
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <!-- ── Login screen ─────────────────────────────── -->
+  <main id="login" class="card login" hidden>
+    <h1>Restock<br><span>Watch</span></h1>
+    <p class="sub">Chope your stuff before it sells out.</p>
+    <form id="loginForm">
+      <input id="password" type="password" placeholder="Password" autocomplete="current-password" required>
+      <button type="submit">Let me in</button>
+    </form>
+    <p id="loginErr" class="err" role="alert"></p>
+  </main>
+
+  <!-- ── Dashboard ────────────────────────────────── -->
+  <main id="app" hidden>
+    <header>
+      <h1>Restock <span>Watch</span></h1>
+      <div class="hdr-btns">
+        <button id="testBtn" class="ghost">Test ping</button>
+        <button id="logoutBtn" class="ghost">Log out</button>
+      </div>
+    </header>
+
+    <!-- Shown until Telegram is linked. Three taps, no chat IDs. -->
+    <section id="tgCard" class="card tg" hidden>
+      <h2>Connect Telegram 📲</h2>
+      <p class="sub">So we can ping your phone the second stuff restocks.</p>
+      <button id="tgStart" type="button">Get my code</button>
+      <div id="tgStep2" hidden>
+        <p>Send this code to your bot in Telegram:</p>
+        <p id="tgCode" class="code mono"></p>
+        <button id="tgFinish" type="button">I've sent it</button>
+      </div>
+      <p id="tgErr" class="err" role="alert"></p>
+    </section>
+
+    <form id="addForm" class="card">
+      <h2>What you eyeing?</h2>
+      <input id="url" type="url" placeholder="Paste product link, e.g. dyson.com.sg/…" required>
+      <input id="name" type="text" maxlength="80" placeholder="Nickname (optional) — e.g. HushJet Teal">
+      <details>
+        <summary>More options</summary>
+        <label>Check every
+          <select id="interval">
+            <option value="60">1 min</option>
+            <option value="180" selected>3 min</option>
+            <option value="600">10 min</option>
+            <option value="1800">30 min</option>
+          </select>
+        </label>
+        <input id="outPhrase" type="text" maxlength="60"
+               placeholder='Sold-out wording on the page (optional), e.g. "Notify me"'>
+      </details>
+      <button type="submit">Start watching</button>
+      <p id="addErr" class="err" role="alert"></p>
+    </form>
+
+    <section id="list" aria-live="polite"></section>
+    <p id="empty" class="sub center">Nothing on your list yet. Paste a link above lah.</p>
+  </main>
+
+  <template id="itemTpl">
+    <article class="item card">
+      <div class="row">
+        <span class="pill"></span>
+        <span class="when mono"></span>
+      </div>
+      <a class="title" target="_blank" rel="noopener noreferrer"></a>
+      <p class="meta mono"></p>
+      <div class="row actions">
+        <a class="buy" target="_blank" rel="noopener noreferrer">Buy now →</a>
+        <button class="ghost check">Check now</button>
+        <button class="ghost del">Remove</button>
+      </div>
+    </article>
+  </template>
+</body>
+</html>

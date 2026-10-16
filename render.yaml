@@ -1,0 +1,31 @@
+# ─────────────────────────────────────────────────────────────
+# render.yaml — a "Blueprint": tells Render exactly how to run
+# this app, so deploying is one form on your phone, no terminal.
+# ─────────────────────────────────────────────────────────────
+services:
+  - type: web
+    name: restock-watch
+    runtime: node
+    region: singapore          # close to the SG shops we're checking
+    plan: starter              # paid tier: never sleeps (free tier sleeps = missed restocks)
+    buildCommand: npm install --omit=dev
+    startCommand: npm start
+    healthCheckPath: /healthz
+    autoDeploy: true           # push to GitHub → Render redeploys by itself
+    disk:                      # keeps your watchlist safe across restarts
+      name: restock-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: DATA_DIR
+        value: /var/data
+      - key: SECURE_COOKIES
+        value: "true"
+      - key: SESSION_SECRET
+        generateValue: true    # Render invents a strong random secret for you
+      - key: ADMIN_PASSWORD
+        sync: false            # Render asks you to type this during setup
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false            # paste the token from @BotFather
